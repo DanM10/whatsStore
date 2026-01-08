@@ -16,6 +16,13 @@ export interface OrderItem {
     cantidad: number;
 }
 
+export interface Cliente {
+    nombre: string;
+    apellido: string;
+    celular: string;
+    direccion: string;
+}
+
 export interface Order {
     id?: string;
     cliente: Cliente;
@@ -29,11 +36,3 @@ export interface Order {
         cancelado?: any;
     };
 }
-
-export interface Cliente {
-    nombre: string;
-    apellido: string;
-    celular: string;
-    direccion: string;
-}
-

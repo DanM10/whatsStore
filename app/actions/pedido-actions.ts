@@ -1,17 +1,16 @@
 import {Property} from "csstype";
-import Order = Property.Order;
 import {addDoc, collection, serverTimestamp} from "firebase/firestore";
 import {db} from "@/lib/firebase";
-import {Cliente, OrderItem} from "@/types/database";
+import {Cliente, Order, OrderItem} from "@/types/database";
 
 export async function crearNuevoPedido(cliente: Cliente, carrito: OrderItem[]) {
     try {
         const total = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
 
         const nuevoPedido: Omit<Order, 'id'> = {
-            cliente,
+            cliente: cliente,
             items: carrito,
-            total,
+            total: Number(total.toFixed(2)),
             estado: 'abierto',
             fechas: {
                 creado: serverTimestamp()
