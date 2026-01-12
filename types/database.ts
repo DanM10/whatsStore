@@ -17,14 +17,20 @@ export interface OrderItem {
 }
 
 export interface Cliente {
+    id?: string;
     nombre: string;
     apellido: string;
     celular: string;
     direccion: string;
+    email?: string; // Opcional
+    fechaRegistro?: any; // Timestamp de Firestore
+    totalPedidos?: number; // Contador de pedidos
+    totalGastado?: number; // Total acumulado
 }
 
 export interface Order {
     id?: string;
+    clienteId: string;
     cliente: Cliente;
     items: OrderItem[];
     total: number;

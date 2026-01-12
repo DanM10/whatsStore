@@ -1,6 +1,8 @@
 import "./globals.css";
 import {Toaster} from 'sonner';
 import Link from "next/link";
+import {exportToExcel, generateReport} from "@/app/actions/report-actions";
+import ReportButtons from "@/components/ReportButtons";
 
 export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
@@ -14,8 +16,14 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
                     📦 Productos
                 </Link>
                 <Link href="/pedidos" className="p-2 hover:bg-slate-100 rounded text-sz-base">
-                    📝 Pedidos
+                    📋 Pedidos
                 </Link>
+                <Link href="/clientes" className="p-2 hover:bg-slate-100 rounded text-sz-base">
+                    👥 Clientes
+                </Link>
+                <div className={"my-3"}>
+                    <ReportButtons></ReportButtons>
+                </div>
             </nav>
         </aside>
 
