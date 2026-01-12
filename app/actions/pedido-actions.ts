@@ -9,7 +9,6 @@ import {
     getDocs,
     where
 } from 'firebase/firestore';
-import {Property} from "csstype";
 import {db} from "@/lib/firebase";
 import {Cliente, Order, OrderItem} from "@/types/database";
 

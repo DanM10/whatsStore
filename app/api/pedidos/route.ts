@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
-import { Cliente, OrderItem, Order } from '@/types/database';
+import {  OrderItem, Order } from '@/types/database';
 
 export async function POST(request: Request) {
     try {
