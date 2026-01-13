@@ -87,7 +87,7 @@ export async function POST(request: Request) {
             },
             items: orderItems,
             total: Number(total.toFixed(2)),
-            estado: 'abierto',
+            estado: 'recibido',
             fechas: {
                 creado: serverTimestamp()
             }

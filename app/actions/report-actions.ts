@@ -1,17 +1,35 @@
 'use client';
 
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Cliente, Product, Order } from "@/types/database";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { query, collection, where, getDocs, Timestamp, orderBy } from "firebase/firestore";
 
-export const getReportData = async () => {
-    const pedidosQuery = query(collection(db, 'pedidos'), where("estado", "!=", "cancelado"));
-    const pedidosSnap = await getDocs(pedidosQuery);
+export const getReportData = async (startDate?: string, endDate?: string) => {
+    const pedidosRef = collection(db, 'pedidos');
+    let q;
 
-    const productosSnap = await getDocs(collection(db, 'productos'));
+    if (startDate && endDate) {
+        // Creamos los límites del día
+        const start = new Date(`${startDate}T00:00:00`);
+        const end = new Date(`${endDate}T23:59:59`);
+
+        q = query(
+            pedidosRef,
+            where("fechas.creado", ">=", Timestamp.fromDate(start)),
+            where("fechas.creado", "<=", Timestamp.fromDate(end)),
+            orderBy("fechas.creado", "asc")
+        );
+    } else {
+        q = query(pedidosRef, where("estado", "!=", "cancelado"));
+    }
+
+    const [pedidosSnap, productosSnap] = await Promise.all([
+        getDocs(q),
+        getDocs(collection(db, 'productos'))
+    ]);
 
     const pedidos = pedidosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
     const productos = productosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
@@ -34,9 +52,8 @@ export const getReportData = async () => {
     return { productos, matrix, clients: Object.values(clientMap) };
 };
 
-
-export const generateReport = async (isPdf: boolean) => {
-    const { productos, matrix, clients } = await getReportData();
+export const generateReport = async (isPdf: boolean, startDate: string, endDate: string) => {
+    const { productos, matrix, clients } = await getReportData(startDate, endDate);
 
     if (isPdf) {
         exportToPDF(productos, clients, matrix);
@@ -44,6 +61,7 @@ export const generateReport = async (isPdf: boolean) => {
         exportToExcel(productos, clients, matrix);
     }
 };
+
 export const exportToExcel = (productos: Product[], clients: Cliente[], matrix: SalesMatrix) => {
     const rows: ExcelRow[] = clients.map(client => {
         const rowData: ExcelRow = { "Cliente": `${client.nombre} ${client.apellido}` };

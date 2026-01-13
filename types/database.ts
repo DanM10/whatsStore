@@ -1,4 +1,4 @@
-export type OrderStatus = 'abierto' | 'cerrado' | 'cancelado';
+export type OrderStatus = 'recibido' | 'entregado' | 'cobrado' | 'cerrado' | 'cancelado';
 
 export interface Product {
     id?: string;

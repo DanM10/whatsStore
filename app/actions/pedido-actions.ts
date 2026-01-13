@@ -54,7 +54,7 @@ export async function crearNuevoPedido(clienteData: Omit<Cliente, 'id' | 'fechaR
             cliente: clienteData,
             items: carrito,
             total: Number(total.toFixed(2)),
-            estado: 'abierto',
+            estado: 'recibido',
             fechas: {
                 creado: serverTimestamp()
             }

@@ -1,7 +1,8 @@
 import {db} from "@/lib/firebase";
-import {doc, getDoc} from "firebase/firestore";
-import {Order} from "@/types/database";
+import {doc, getDoc, updateDoc} from "firebase/firestore";
+import {Order, OrderStatus} from "@/types/database";
 import Link from "next/link";
+import CambiarEstadoButtons from "@/components/CambiarEstadoButtons";
 
 export default async function DetallePedidoPage({params}: {
     params: Promise<{ id: string }>
@@ -34,11 +35,20 @@ export default async function DetallePedidoPage({params}: {
                     <h3 className="text-muted text-sz-xs uppercase font-bold">Celular</h3>
                     <p className="text-sz-sm">{pedido.cliente.celular}</p>
                 </div>
+                <div>
+                    <h3 className="text-muted text-sz-xs uppercase font-bold">Fecha de creacion</h3>
+                    <p className="text-sz-sm">{pedido.fechas.creado.toDate().toLocaleDateString()}</p>
+                </div>
                 <div className="col-span-2">
                     <h3 className="text-muted text-sz-xs uppercase font-bold">Dirección</h3>
                     <p className="text-sz-sm">{pedido.cliente.direccion}</p>
                 </div>
             </section>
+
+            <div className="flex justify-between items-center mb-6">
+                <CambiarEstadoButtons estado={pedido.estado} id={pedido.id!}>
+                </CambiarEstadoButtons>
+            </div>
 
             <table className="w-full text-sz-sm mb-6">
                 <thead className="border-b">
