@@ -1,6 +1,6 @@
-import { db } from "@/lib/firebase";
-import { doc, getDoc, collection, query, where, getDocs, orderBy } from "firebase/firestore";
-import { Cliente, Order } from "@/types/database";
+import {db} from "@/lib/firebase";
+import {doc, getDoc, collection, query, where, getDocs, orderBy} from "firebase/firestore";
+import {Cliente, Order} from "@/types/database";
 import Link from "next/link";
 import ClienteEditForm from "@/components/Clienteeditform";
 import ClienteDeleteButton from "@/components/ClienteDeleteForm";
@@ -10,7 +10,7 @@ export default async function DetalleClientePage({
                                                  }: {
     params: Promise<{ id: string }>
 }) {
-    const { id } = await params;
+    const {id} = await params;
 
     // Obtener datos del cliente
     const clienteRef = doc(db, "clientes", id);
@@ -27,7 +27,7 @@ export default async function DetalleClientePage({
         );
     }
 
-    const cliente = { id: clienteSnap.id, ...clienteSnap.data() } as Cliente;
+    const cliente = {id: clienteSnap.id, ...clienteSnap.data()} as Cliente;
 
     // Obtener pedidos del cliente
     const pedidosQuery = query(
@@ -36,12 +36,17 @@ export default async function DetalleClientePage({
         orderBy("fechas.creado", "desc")
     );
     const pedidosSnap = await getDocs(pedidosQuery);
-    const pedidos = pedidosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[];
+    const pedidos = pedidosSnap.docs.map(doc => ({id: doc.id, ...doc.data()})) as Order[];
 
-    const statusStyles = {
+    const statusStyles: Record<string, string> = {
         abierto: "bg-blue-100 text-blue-700",
         cerrado: "bg-green-100 text-green-700",
         cancelado: "bg-red-100 text-red-700",
+        recibido: "bg-purple-100 text-purple-700",
+    };
+
+    const getStatusClass = (estado: string) => {
+        return statusStyles[estado] || "bg-gray-100 text-gray-700";
     };
 
     return (
@@ -56,7 +61,7 @@ export default async function DetalleClientePage({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Información del Cliente */}
                 <div className="lg:col-span-2">
-                    <ClienteEditForm cliente={cliente} />
+                    <ClienteEditForm cliente={cliente}/>
                 </div>
 
                 {/* Estadísticas */}
@@ -86,7 +91,7 @@ export default async function DetalleClientePage({
                     </div>
 
                     {/* Botón de Eliminar */}
-                    <ClienteDeleteButton clienteId={id} tienePedidos={pedidos.length > 0} />
+                    <ClienteDeleteButton clienteId={id} tienePedidos={pedidos.length > 0}/>
                 </div>
             </div>
 
@@ -131,8 +136,9 @@ export default async function DetalleClientePage({
                                         ${pedido.total.toFixed(2)}
                                     </td>
                                     <td className="p-4">
-                                            <span className={`px-2 py-1 rounded-full text-sz-xs font-medium ${statusStyles[pedido.estado]}`}>
-                                                {pedido.estado.toUpperCase()}
+                                            <span
+                                                className={`px-2 py-1 rounded-full text-sz-xs font-medium ${getStatusClass(pedido.estado)}`}>
+                                                            {pedido.estado.toUpperCase()}
                                             </span>
                                     </td>
                                     <td className="p-4">
