@@ -19,7 +19,9 @@ export default function NuevoPedidoPage() {
         apellido: "",
         celular: "",
         direccion: "",
-        email: ""
+        email: "",
+        latitud: undefined,
+        longitud: undefined
     });
     const [loading, setLoading] = useState(true);
 
@@ -57,7 +59,9 @@ export default function NuevoPedidoPage() {
                     apellido: clienteData.apellido,
                     celular: clienteData.celular,
                     direccion: clienteData.direccion || "",
-                    email: clienteData.email || ""
+                    email: clienteData.email || "",
+                    latitud: clienteData.latitud,
+                    longitud: clienteData.longitud
                 });
                 toast.success("¡Cliente encontrado!");
             } else {
@@ -67,7 +71,9 @@ export default function NuevoPedidoPage() {
                     apellido: "",
                     celular: celularBusqueda.trim(),
                     direccion: "",
-                    email: ""
+                    email: "",
+                    latitud: undefined,
+                    longitud: undefined
                 });
                 toast.info("Cliente no encontrado. Completa los datos para crear uno nuevo.");
             }
@@ -87,8 +93,38 @@ export default function NuevoPedidoPage() {
             apellido: "",
             celular: "",
             direccion: "",
-            email: ""
+            email: "",
+            latitud: undefined,
+            longitud: undefined
         });
+    };
+
+    // Función para obtener ubicación actual
+    const obtenerUbicacionActual = () => {
+        if ("geolocation" in navigator) {
+            toast.info("Obteniendo ubicación...");
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setCliente({
+                        ...cliente,
+                        latitud: position.coords.latitude,
+                        longitud: position.coords.longitude
+                    });
+                    toast.success("Ubicación obtenida correctamente");
+                },
+                (error) => {
+                    console.error("Error al obtener ubicación:", error);
+                    toast.error("No se pudo obtener la ubicación. Por favor, ingresa las coordenadas manualmente.");
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                }
+            );
+        } else {
+            toast.error("Tu navegador no soporta geolocalización");
+        }
     };
 
     if (loading) return <p>Cargando formulario...</p>;
@@ -217,7 +253,7 @@ export default function NuevoPedidoPage() {
                     </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 gap-4 mb-4">
                     <input
                         placeholder="Nombre *"
                         value={cliente.nombre}
@@ -253,6 +289,76 @@ export default function NuevoPedidoPage() {
                         onChange={e => setCliente({ ...cliente, direccion: e.target.value })}
                         disabled={!!clienteEncontrado}
                     />
+                </div>
+
+                {/* SECCIÓN DE COORDENADAS GPS */}
+                <div className="mb-6 p-4 bg-white rounded border border-border">
+                    <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-sz-sm font-semibold text-muted">Ubicación GPS</h3>
+                        <button
+                            type="button"
+                            onClick={obtenerUbicacionActual}
+                            disabled={!!clienteEncontrado}
+                            className="text-sz-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        >
+                            📍 Usar mi ubicación
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-sz-xs text-muted mb-1">Latitud</label>
+                            <input
+                                type="number"
+                                step="any"
+                                placeholder="-17.7833"
+                                className="w-full p-2 border rounded text-sz-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                value={cliente.latitud ?? ''}
+                                onChange={e => setCliente({
+                                    ...cliente,
+                                    latitud: e.target.value ? parseFloat(e.target.value) : undefined
+                                })}
+                                disabled={!!clienteEncontrado}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sz-xs text-muted mb-1">Longitud</label>
+                            <input
+                                type="number"
+                                step="any"
+                                placeholder="-63.1821"
+                                className="w-full p-2 border rounded text-sz-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                value={cliente.longitud ?? ''}
+                                onChange={e => setCliente({
+                                    ...cliente,
+                                    longitud: e.target.value ? parseFloat(e.target.value) : undefined
+                                })}
+                                disabled={!!clienteEncontrado}
+                            />
+                        </div>
+                    </div>
+
+                    {cliente.latitud !== undefined && cliente.longitud !== undefined && (
+                        <div className="mt-2 flex items-center justify-between">
+                            <p className="text-sz-xs text-green-600">
+                                ✓ Coordenadas: {cliente.latitud.toFixed(6)}, {cliente.longitud.toFixed(6)}
+                            </p>
+                            <a
+                                href={`https://www.google.com/maps?q=${cliente.latitud},${cliente.longitud}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sz-xs text-blue-600 hover:underline"
+                            >
+                                Ver en mapa
+                            </a>
+                        </div>
+                    )}
+
+                    {clienteEncontrado && (cliente.latitud === undefined || cliente.longitud === undefined) && (
+                        <p className="text-sz-xs text-amber-600 mt-2">
+                            ⚠️ Este cliente no tiene coordenadas GPS registradas
+                        </p>
+                    )}
                 </div>
 
                 {/* RESUMEN DEL CARRITO */}

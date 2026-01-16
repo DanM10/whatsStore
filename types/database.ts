@@ -23,6 +23,8 @@ export interface Cliente {
     celular: string;
     direccion: string;
     email?: string; // Opcional
+    latitud?: number;
+    longitud?: number;
     fechaRegistro?: any; // Timestamp de Firestore
     totalPedidos?: number; // Contador de pedidos
     totalGastado?: number; // Total acumulado

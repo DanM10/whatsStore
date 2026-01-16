@@ -1,8 +1,7 @@
 import {db} from "@/lib/firebase";
-import {doc, getDoc, updateDoc} from "firebase/firestore";
-import {Order, OrderStatus} from "@/types/database";
+import {doc, getDoc} from "firebase/firestore";
+import {Order} from "@/types/database";
 import Link from "next/link";
-import CambiarEstadoButtons from "@/components/CambiarEstadoButtons";
 
 export default async function DetallePedidoPage({params}: {
     params: Promise<{ id: string }>
@@ -43,12 +42,30 @@ export default async function DetallePedidoPage({params}: {
                     <h3 className="text-muted text-sz-xs uppercase font-bold">Dirección</h3>
                     <p className="text-sz-sm">{pedido.cliente.direccion}</p>
                 </div>
-            </section>
 
-            <div className="flex justify-between items-center mb-6">
-                <CambiarEstadoButtons estado={pedido.estado} id={pedido.id!}>
-                </CambiarEstadoButtons>
-            </div>
+                {/* Mostrar coordenadas GPS si existen */}
+                {(pedido.cliente.latitud !== undefined && pedido.cliente.longitud !== undefined) && (
+                    <div className="col-span-2">
+                        <h3 className="text-muted text-sz-xs uppercase font-bold mb-2">Ubicación GPS</h3>
+                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded">
+                            <div className="flex-1">
+                                <p className="text-sz-sm">
+                                    <span className="font-semibold">Lat:</span> {pedido.cliente.latitud.toFixed(6)} |
+                                    <span className="font-semibold ml-2">Lng:</span> {pedido.cliente.longitud.toFixed(6)}
+                                </p>
+                            </div>
+                            <a
+                                href={`https://www.google.com/maps?q=${pedido.cliente.latitud},${pedido.cliente.longitud}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-blue-500 text-white px-3 py-1 rounded text-sz-xs hover:bg-blue-600 transition"
+                            >
+                                📍 Ver en mapa
+                            </a>
+                        </div>
+                    </div>
+                )}
+            </section>
 
             <table className="w-full text-sz-sm mb-6">
                 <thead className="border-b">

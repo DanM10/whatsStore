@@ -136,10 +136,10 @@ export default async function DetalleClientePage({
                                         ${pedido.total.toFixed(2)}
                                     </td>
                                     <td className="p-4">
-                                            <span
-                                                className={`px-2 py-1 rounded-full text-sz-xs font-medium ${getStatusClass(pedido.estado)}`}>
-                                                            {pedido.estado.toUpperCase()}
-                                            </span>
+                                        <span
+                                            className={`px-2 py-1 rounded-full text-sz-xs font-medium ${getStatusClass(pedido.estado)}`}>
+                                            {pedido.estado.toUpperCase()}
+                                        </span>
                                     </td>
                                     <td className="p-4">
                                         <Link
